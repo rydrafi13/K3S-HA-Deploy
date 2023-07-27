@@ -143,7 +143,7 @@ ss -tulpn | grep 6443
 ### Setup control plane
 Setup Cluster K3S Without Flannel we use Calico as CNI
 ```
-curl -sfL https://get.k3s.io |  INSTALL_K3S_VERSION=v1.27.3+k3s1 sh -s - server --cluster-init --tls-san 10.10.10.59 --flannel-backend=none
+curl -sfL https://get.k3s.io |  INSTALL_K3S_VERSION=v1.27.3+k3s1 sh -s - server --cluster-init --tls-san 10.10.10.59 --flannel-backend=none --disable-network-policy
 ```
 
 get token
@@ -158,7 +158,7 @@ qwertyuiop
 
 ### Setup other control plane
 ```
-curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.27.3+k3s1 sh -s - server --server https://10.10.10.59:6443 --token "qwertyuiop" --tls-san 10.10.10.59 --flannel-backend=none
+curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.27.3+k3s1 sh -s - server --server https://10.10.10.59:6443 --token "qwertyuiop" --tls-san 10.10.10.59 --flannel-backend=none --disable-network-policy
 ```
 
 ### Setup worker node
@@ -166,13 +166,23 @@ curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.27.3+k3s1 sh -s - server -
 curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.27.3+k3s1 sh -s - agent --server https://10.10.10.59:6443 --token "qwertyuiop"
 ```
 
-## Install Addon on cluster 
+## Install Addon on cluster                 
 ### Calico
+Calico Operator
 ```
 kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/tigera-operator.yaml
 kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/custom-resources.yaml
 ```
 
+Calico Manifest
+```
+curl https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/calico.yaml
+kubectl apply -f calico.yaml
+```
+
+### Dashboard
+```
+``` 
 ## Opsional 
 ### Reset Cluster
 on server
