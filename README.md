@@ -166,22 +166,23 @@ curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.27.3+k3s1 sh -s - server -
 curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.27.3+k3s1 sh -s - agent --server https://10.10.10.59:6443 --token "qwertyuiop"
 ```
 
-## Install Addon on cluster                 
+## Install Addon on cluster
+### Worker Label
+Add worker label
+```
+kubectl label node worker1 node-role.kubernetes.io/worker=worker
+kubectl label node worker2 node-role.kubernetes.io/worker=worker
+kubectl label node worker3 node-role.kubernetes.io/worker=worker
+```                 
 ### Calico
 Calico Operator
 ```
 kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/tigera-operator.yaml
 kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/custom-resources.yaml
 ```
-
-Calico Manifest
-```
-curl https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/calico.yaml
-kubectl apply -f calico.yaml
-```
-
 ### Dashboard
 ```
+
 ``` 
 ## Opsional 
 ### Reset Cluster
