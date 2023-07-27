@@ -40,7 +40,26 @@ echo "rafiryd ALL=(ALL:ALL) NOPASSWD:ALL" > /etc/sudoers.d/rafiryd
 
 ### Set hostname
 ```
-hostnamectl set-hostname hostname
+// on node loadbalancer
+hostnamectl set-hostname loadbalancer
+
+// on node cp1
+hostnamectl set-hostname cp1
+
+// on node cp2
+hostnamectl set-hostname cp2
+
+// on node cp3
+hostnamectl set-hostname cp3
+
+// on node worker1
+hostnamectl set-hostname worker1
+
+// on node worker2
+hostnamectl set-hostname worker2
+
+// on node worker3
+hostnamectl set-hostname worker3
 ```
 
 ### Set Timedate
@@ -60,10 +79,10 @@ network:
   ethernets:
     ens160:
       dhcp4: false
-      addresses: [10.23.x.x/22]
+      addresses: [10.10.10.x/24]
       routes:
         - to: default
-          via: 10.23.0.1
+          via: 10.10.10.254
       nameservers:
         addresses: [1.1.1.1,8.8.8.8]
   version: 2
@@ -122,6 +141,7 @@ ss -tulpn | grep 6443
 
 ## Set up Cluster
 ### Setup control plane
+Setup Cluster K3S Without Flannel we use Calico as CNI
 ```
 curl -sfL https://get.k3s.io |  INSTALL_K3S_VERSION=v1.27.3+k3s1 sh -s - server --cluster-init --tls-san 10.10.10.59 --flannel-backend=none
 ```
@@ -137,10 +157,14 @@ qwertyuiop
 ```
 
 ### Setup other control plane
+```
 curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.27.3+k3s1 sh -s - server --server https://10.10.10.59:6443 --token "qwertyuiop" --tls-san 10.10.10.59 --flannel-backend=none
+```
 
 ### Setup worker node
+```
 curl -sfL https://get.k3s.io | INSTALL_K3S_VERSION=v1.27.3+k3s1 sh -s - agent --server https://10.10.10.59:6443 --token "qwertyuiop"
+```
 
 ## Install Addon on cluster 
 ### Calico
