@@ -27,7 +27,7 @@ worker3: 10.10.10.62/24
 ```
 
 ### Topology
-[![High Availability K3S](k3s-architecture-ha-embedded.svg)(https://mdg.imgix.net/assets/images/shiprock.jpg?auto=format&fit=clip&q=40&w=1080)]
+![High Availability K3S](k3s-architecture-ha-embedded.svg)
 
 ## Pre Install
 ### Add New User
