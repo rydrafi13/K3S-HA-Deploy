@@ -232,7 +232,6 @@ subjects:
   namespace: kubernetes-dashboard
 ```
 
-
 Deploy
 ```
 kubectl apply -f .
