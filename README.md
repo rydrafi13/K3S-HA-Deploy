@@ -181,9 +181,67 @@ kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.1
 kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/custom-resources.yaml
 ```
 ### Dashboard
+Deploy Dashboard
+```
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.7.0/aio/deploy/recommended.yaml
+``` 
+
+Expose Dashboard
+```
+kubectl get all -n kubernetes-dashboard
+kubectl edit svc kubernetes-dashboard -n kubernetes-dashboard
 ```
 
-``` 
+Access Dashboard
+```
+https://10.10.10.28:32224
+```
+
+Create Dashboard Admin User
+```
+vim dashboard.admin-user.yml
+```
+
+Edit
+```
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: admin-user
+  namespace: kubernetes-dashboard
+```
+
+Create Dashboard Admin Role
+```
+dashboard.admin-user-role.yml
+```
+
+Edit
+```
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: admin-user
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+- kind: ServiceAccount
+  name: admin-user
+  namespace: kubernetes-dashboard
+```
+
+
+Deploy
+```
+kubectl apply -f .
+```
+
+Generate Token
+```
+kubectl -n kubernetes-dashboard create token admin-user
+```
 ## Opsional 
 ### Reset Cluster
 on server
