@@ -251,3 +251,138 @@ on agent
 ```
 /usr/local/bin/k3s-agent-uninstall.sh
 ```
+
+### Change Cluster Name
+config file k3s 
+```
+vim k3s.yml
+```
+
+edit
+```
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority-data: DATA+OMITTED
+    server: https://10.10.10.59:6443
+  name: cluster2
+contexts:
+- context:
+    cluster: cluster2
+    user: admin-cluster2
+  name: admin
+current-context: admin
+kind: Config
+preferences: {}
+users:
+- name: admin-cluster2
+  user:
+    client-certificate-data: DATA+OMITTED
+    client-key-data: DATA+OMITTED
+```
+
+check cluster config
+```
+kubectl config view
+kubectl config get-contexts
+```
+
+### Access Multi Cluster
+create new kubeconfig file
+```
+vim cluster-config
+```
+
+edit
+```
+apiVersion: v1
+kind: Config
+preferences: {}
+
+clusters:
+- cluster:
+  name: cluster1
+- cluster:
+  name: cluster2
+
+users:
+- name: admin-cluster1
+- name: admin-cluster2
+
+contexts:
+- context:
+  name: cluster1-management
+- context:
+  name: cluster2-management
+```
+
+set cluster
+```
+kubectl config --kubeconfig=cluster-config set-cluster cluster1 --server https://ip-cluster1:6443 --certificate-authority-data=zzzz
+kubectl config --kubeconfig=cluster-config set-cluster cluster2 --server https://ip-cluster2:6443 --certificate-authority-data=zzzz
+```
+
+set credentials
+```
+kubectl config --kubeconfig=cluster-config set-credentials admin-cluster1 --client-certificate-data=zzzzz --client-key-data=zzzzz
+kubectl config --kubeconfig=cluster-config set-credentials admin-cluster2 --client-certificate-data=zzzzz --client-key-data=zzzzz
+```
+
+set contexts
+```
+kubectl config --kubeconfig=cluster-config set-contexts cluster1-management
+kubectl config --kubeconfig=cluster-config set-contexts cluster2-management
+```
+
+verify
+```
+kubectl config --kubeconfig=cluster-config view
+kubectl config --kubeconfig=cluster-config get-contexts
+```
+
+use context
+```
+kubectl config --kubeconfig=cluster-config use-context cluster1-management
+kubectl config --kubeconfig=cluster-config use-context cluster2-management
+```
+### Connect Private Registry
+login private registry
+```
+docker login https://url-registry
+```
+
+view registry credentials config
+```
+cat $HOME/.docker/config.json
+```
+
+create secret from registry credentials config
+```
+kubectl  create secret generic private-connect --from-file=.dockerconfigjson=$HOME/.docker/config.json --type=kubernetes.io/dockerconfigjson
+```
+
+create deployment with registry credentials config
+```
+vim deployment.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sample-apps-nginx
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: ct-nginx
+        image: url-registry/local/nginx
+        ports:
+        - containerPort: 80
+      imagePullSecrets:
+        - name: private-connect
+```
